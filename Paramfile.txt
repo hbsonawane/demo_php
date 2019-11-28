@@ -1,0 +1,107 @@
+properties([parameters([choice(choices: ['java','PHPMailer','node-js-sample'], description: 'choose the source code to build', name: 'sourcecode'), choice(choices: ['maven','nant','npm'], description: 'choose the environment to build', name: 'environment')])])
+pipeline
+{
+    agent
+    {
+        label 'master'
+    }
+    environment
+    {
+        source_code="${params.sourcecode}"
+        env="${params.environment}"
+    }
+    stages
+    {
+        stage('SCM Checkout Java')
+        {
+            when
+            {
+                environment name: 'source_code', value: 'java'
+            }
+            steps
+            {
+		echo "Checking out code"
+                git credentialsId: 'f444a553-6df0-441e-946d-bea57943fdd6', url: 'https://github.com/trishita11/java.git'
+            }
+        }
+        stage('SCM Checkout PHP')
+        {
+            when
+            {
+                environment name: 'source_code', value: 'PHPMailer'
+            }
+            steps
+            {
+		echo "Checking out code"
+                git credentialsId: 'f444a553-6df0-441e-946d-bea57943fdd6', url: 'https://github.com/trishita11/PHPMailer.git'
+            }
+        }
+        stage('SCM Checkout Node')
+        {
+            when
+            {
+                environment name: 'source_code', value: 'node-js-sample'
+            }
+            steps
+            {
+		echo "Checking out code"
+                git credentialsId: 'f444a553-6df0-441e-946d-bea57943fdd6', url: 'https://github.com/trishita11/node-js-sample.git'
+            }
+        }
+        stage('Build Java')
+        {
+            when
+            {
+                allOf
+                {
+                    environment name: 'source_code', value: 'java'
+                    environment name: 'env', value: 'maven'
+                }
+            }
+            steps
+            {
+                echo "Building ${source_code} using ${env}"
+		echo "Build Successful"
+            }
+        }
+	stage('Build PHP')
+        {
+            when
+            {
+                allOf
+                {
+                    environment name: 'source_code', value: 'PHPMailer'
+                    environment name: 'env', value: 'nant'
+                }
+            }
+            steps
+            {
+                echo "Building ${source_code} using ${env}"
+		echo "Build Successful"
+            }
+        }
+	stage('Build Node')
+        {
+            when
+            {
+                allOf
+                {
+                    environment name: 'source_code', value: 'node-js-sample'
+                    environment name: 'env', value: 'npm'
+                }
+            }
+            steps
+            {
+                echo "Building ${source_code} using ${env}"
+		echo "Build Successful"
+            }
+        }
+        stage('Test')
+        {
+            steps
+            {
+                echo "Test Successful"
+            }
+        }
+    }
+}
